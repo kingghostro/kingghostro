@@ -371,6 +371,31 @@
     }
     #shootModal .modal-body img:last-child { margin-bottom: 0; }
 
+    /* See All: grid of thumbnails */
+    #shootModal .modal-body.photo-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 0.5rem;
+    }
+    #shootModal .modal-body.photo-grid img {
+      aspect-ratio: 1 / 1; object-fit: cover; margin: 0;
+      border-radius: 4px; cursor: zoom-in;
+      transition: transform 0.2s, filter 0.2s; filter: brightness(0.9);
+    }
+    #shootModal .modal-body.photo-grid img:hover { transform: scale(1.06); filter: brightness(1.1); position: relative; z-index: 1; }
+    @media (max-width: 992px) { #shootModal .modal-body.photo-grid { grid-template-columns: repeat(6, 1fr); } }
+    @media (max-width: 576px) { #shootModal .modal-body.photo-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    /* big preview when you click a thumbnail */
+    #photoPreview {
+      position: absolute; inset: 0; z-index: 5;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(5,8,11,0.94); cursor: zoom-out; padding: 1rem;
+      border-radius: inherit;
+    }
+    #photoPreview.open { display: flex; }
+    #photoPreview img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; }
+
     /* ── Resume / College / Contact ──────────── */
     #more { background: var(--bg); }
 
@@ -488,6 +513,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="shootPhotos"></div>
+        <div id="photoPreview"><img alt="Photo preview"></div>
       </div>
     </div>
   </div>
@@ -636,6 +662,13 @@
     const shootModalEl = document.getElementById('shootModal');
     const shootModal = new bootstrap.Modal(shootModalEl);
 
+    function setGridMode(on) {
+      document.getElementById('shootPhotos').classList.toggle('photo-grid', on);
+      shootModalEl.querySelector('.modal-dialog').classList.toggle('modal-xl', on);
+      shootModalEl.querySelector('.modal-dialog').classList.toggle('modal-lg', !on);
+      document.getElementById('photoPreview').classList.remove('open');
+    }
+
     function makeDeck(shoot) {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -648,6 +681,7 @@
          <div class="deck-card c1">${img}</div>
          <div class="deck-label"><b>${shoot.title}</b><span>${shoot.photos.length} photo${shoot.photos.length > 1 ? 's' : ''} →</span></div>`;
       btn.addEventListener('click', () => {
+        setGridMode(false);
         document.getElementById('shootTitle').textContent = shoot.title;
         document.getElementById('shootSub').textContent = '// ' + shoot.sub.toLowerCase();
         document.getElementById('shootPhotos').innerHTML =
@@ -668,8 +702,8 @@
     //   'image'   -> src: 'images/presentation.gif'  (gif or picture)
     // Leave src/id empty to show a "coming soon" placeholder.
     const demos = {
-      demoApp:          { type: 'youtube', id: '', src: '' },
-      demoPresentation: { type: 'iframe',  id: '', src: '' }
+      demoApp:          { type: 'video', src: 'videos/app-demo.mp4',     poster: 'videos/app-demo-poster.jpg' },
+      demoPresentation: { type: 'video', src: 'videos/presentation.mp4', poster: 'videos/presentation-poster.jpg' }
     };
 
     Object.entries(demos).forEach(([boxId, d]) => {
@@ -678,7 +712,7 @@
       if (d.type === 'youtube' && d.id) {
         html = `<iframe src="https://www.youtube.com/embed/${d.id}" title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
       } else if (d.type === 'video' && d.src) {
-        html = `<video src="${d.src}" controls preload="metadata" playsinline></video>`;
+        html = `<video src="${d.src}" ${d.poster ? `poster="${d.poster}"` : ''} controls preload="metadata" playsinline></video>`;
       } else if (d.type === 'iframe' && d.src) {
         html = `<iframe src="${d.src}" title="Presentation" allowfullscreen></iframe>`;
       } else if (d.type === 'image' && d.src) {
@@ -692,12 +726,25 @@
     const extraPhotos = ['extra-01','extra-02','extra-03','extra-04','extra-05','extra-06','extra-07','extra-08','extra-09','extra-10','extra-11','extra-12','extra-13','extra-14'].map(W);
     document.getElementById('seeAll').addEventListener('click', () => {
       const all = [...portraitShoots, ...landscapeShoots].flatMap(s => s.photos).concat(extraPhotos);
+      setGridMode(true);
       document.getElementById('shootTitle').textContent = 'All Photos';
-      document.getElementById('shootSub').textContent = '// ' + all.length + ' photos';
+      document.getElementById('shootSub').textContent = '// ' + all.length + ' photos · click one to enlarge';
       document.getElementById('shootPhotos').innerHTML =
-        all.map(p => `<img src="${p}" alt="Photo" loading="lazy">`).join('');
+        all.map(p => `<img src="${p.replace('/web/', '/thumb/')}" data-full="${p}" alt="Photo" loading="lazy">`).join('');
+      document.getElementById('shootPhotos').scrollTop = 0;
       shootModal.show();
     });
+
+    // click a thumbnail -> big preview; click the preview -> close it
+    const preview = document.getElementById('photoPreview');
+    document.getElementById('shootPhotos').addEventListener('click', e => {
+      const t = e.target.closest('img[data-full]');
+      if (!t) return;
+      preview.querySelector('img').src = t.dataset.full;
+      preview.classList.add('open');
+    });
+    preview.addEventListener('click', () => preview.classList.remove('open'));
+    shootModalEl.addEventListener('hidden.bs.modal', () => preview.classList.remove('open'));
   </script>
 
 </body>
