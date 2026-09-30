@@ -186,7 +186,40 @@
     }
 
     /* ── Project Cards ───────────────────────── */
-    #projects { background: var(--bg); }
+    #projects { background: var(--surface); }
+
+    /* ── Demos (video / slideshow) ───────────── */
+    #demo { background: var(--bg); }
+    .demo-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      height: 100%;
+    }
+    .demo-media {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid var(--border);
+    }
+    .demo-media iframe, .demo-media video, .demo-media img {
+      width: 100%; height: 100%; border: 0; display: block; object-fit: contain;
+    }
+    .demo-empty {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 100%;
+      font-family: 'DM Mono', monospace; font-size: 0.75rem;
+      color: var(--text-muted); letter-spacing: 0.1em;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .demo-card h5 { font-weight: 700; font-size: 1.05rem; margin: 1rem 0 0.35rem; }
+    .demo-card p  { font-size: 0.875rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
 
     .project-card {
       background: var(--surface-2);
@@ -396,6 +429,7 @@
       <div class="collapse navbar-collapse justify-content-end" id="navMenu">
         <ul class="navbar-nav gap-2">
           <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#demo">Demos</a></li>
           <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
           <li class="nav-item"><a class="nav-link" href="#more">Contact</a></li>
           <li class="nav-item ms-2">
@@ -437,7 +471,7 @@
       </div>
 
       <div class="text-center mt-4">
-        <a href="https://www.dropbox.com/your-folder-link" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm">See All ↗</a>
+        <button type="button" id="seeAll" class="btn btn-ghost btn-sm">See All Photos ↓</button>
       </div>
     </div>
   </section>
@@ -457,6 +491,31 @@
       </div>
     </div>
   </div>
+
+  <section id="demo">
+    <div class="container">
+      <div class="section-label">// demos</div>
+      <h2 class="section-title">App Demo & Presentation</h2>
+      <div class="section-divider"></div>
+
+      <div class="row g-4">
+        <div class="col-lg-6 fade-up">
+          <div class="demo-card">
+            <div class="demo-media ratio ratio-16x9" id="demoApp"></div>
+            <h5>App Demo</h5>
+            <p>A walkthrough of the app I designed in Figma.</p>
+          </div>
+        </div>
+        <div class="col-lg-6 fade-up" style="transition-delay:.1s">
+          <div class="demo-card">
+            <div class="demo-media ratio ratio-16x9" id="demoPresentation"></div>
+            <h5>Presentation</h5>
+            <p>The slides and pitch behind the project.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section id="projects">
     <div class="container">
@@ -553,21 +612,25 @@
     // cover  = best photo of the shoot (top of the deck)
     // photos = every photo in the shoot (shown when the deck is opened)
     // pos    = optional crop focus for the cover (CSS object-position)
-    const W = n => `images/web/${n}.JPG`;
-    const C = n => `images/cover/${n}.JPG`;
+    const W = n => `images/web/${n}.jpg`;
+    const C = n => `images/cover/${n}.jpg`;
 
     const portraitShoots = [
-      { title: 'Photoshoot 1', sub: 'Portrait', cover: C('IMG_7445'), pos: '50% 50%',
-        photos: ['IMG_7445','IMG_7446','IMG_7477'].map(W) },
-      { title: 'Photoshoot 2', sub: 'Portrait', cover: C('IMG_6249'), pos: '52% 50%',
-        photos: ['IMG_6249','IMG_5298'].map(W) }
+      { title: 'Scarface Fits', sub: 'Portrait', cover: C('scarface'),
+        photos: ['scarface-01','scarface-02','scarface-03','scarface-04','scarface-05','scarface-06','scarface-07','scarface-08','scarface-09','scarface-10','scarface-11','scarface-12','scarface-13','scarface-14','scarface-15','scarface-16','scarface-17','scarface-18','scarface-19','scarface-20'].map(W) },
+      { title: 'Skate Session', sub: 'Portrait', cover: C('skate'),
+        photos: ['skate-01','skate-02','skate-03','skate-04'].map(W) }
     ];
 
     const landscapeShoots = [
-      { title: 'Photoshoot 3', sub: 'Landscape', cover: C('IMG_6859'), photos: ['IMG_6859'].map(W) },
-      { title: 'Photoshoot 4', sub: 'Landscape', cover: C('IMG_6999'), photos: ['IMG_6999'].map(W) },
-      { title: 'Photoshoot 5', sub: 'Landscape', cover: C('IMG_7303'), photos: ['IMG_7303'].map(W) },
-      { title: 'Photoshoot 6', sub: 'Landscape', cover: C('IMG_7446'), photos: ['IMG_7446','IMG_7477'].map(W) }
+      { title: 'Forest', sub: 'Landscape', cover: C('forest'),
+        photos: ['forest-01','forest-02','forest-03','forest-04','forest-05','forest-06','forest-07','forest-08','forest-09','forest-10','forest-11','forest-12','forest-13','forest-14'].map(W) },
+      { title: 'Golden Hour', sub: 'Landscape', cover: C('golden'),
+        photos: ['golden-01','golden-02','golden-03','golden-04'].map(W) },
+      { title: 'Summer', sub: 'Landscape', cover: C('summer'),
+        photos: ['summer-01','summer-02','summer-03','summer-04'].map(W) },
+      { title: 'Street', sub: 'Landscape', cover: C('street'),
+        photos: ['street-01','street-02','street-03','street-04'].map(W) }
     ];
 
     const shootModalEl = document.getElementById('shootModal');
@@ -596,6 +659,45 @@
 
     portraitShoots.forEach(s => document.getElementById('portraitDecks').appendChild(makeDeck(s)));
     landscapeShoots.forEach(s => document.getElementById('landscapeDecks').appendChild(makeDeck(s)));
+
+    // ── Demos ────────────────────────────────────
+    // Fill in ONE line per box. type can be:
+    //   'youtube' -> id: the part after v= in the YouTube link (upload as Unlisted)
+    //   'video'   -> src: 'videos/demo.mp4'   (small file, under ~25MB)
+    //   'iframe'  -> src: a Google Slides "Publish to web" embed link
+    //   'image'   -> src: 'images/presentation.gif'  (gif or picture)
+    // Leave src/id empty to show a "coming soon" placeholder.
+    const demos = {
+      demoApp:          { type: 'youtube', id: '', src: '' },
+      demoPresentation: { type: 'iframe',  id: '', src: '' }
+    };
+
+    Object.entries(demos).forEach(([boxId, d]) => {
+      const box = document.getElementById(boxId);
+      let html = '<div class="demo-empty">// coming soon</div>';
+      if (d.type === 'youtube' && d.id) {
+        html = `<iframe src="https://www.youtube.com/embed/${d.id}" title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+      } else if (d.type === 'video' && d.src) {
+        html = `<video src="${d.src}" controls preload="metadata" playsinline></video>`;
+      } else if (d.type === 'iframe' && d.src) {
+        html = `<iframe src="${d.src}" title="Presentation" allowfullscreen></iframe>`;
+      } else if (d.type === 'image' && d.src) {
+        html = `<img src="${d.src}" alt="Presentation">`;
+      }
+      box.innerHTML = html;
+    });
+
+    // ── See All Photos ───────────────────────────
+    // every photo from every shoot, then the extra photos that aren't in a shoot
+    const extraPhotos = ['extra-01','extra-02','extra-03','extra-04','extra-05','extra-06','extra-07','extra-08','extra-09','extra-10','extra-11','extra-12','extra-13','extra-14'].map(W);
+    document.getElementById('seeAll').addEventListener('click', () => {
+      const all = [...portraitShoots, ...landscapeShoots].flatMap(s => s.photos).concat(extraPhotos);
+      document.getElementById('shootTitle').textContent = 'All Photos';
+      document.getElementById('shootSub').textContent = '// ' + all.length + ' photos';
+      document.getElementById('shootPhotos').innerHTML =
+        all.map(p => `<img src="${p}" alt="Photo" loading="lazy">`).join('');
+      shootModal.show();
+    });
   </script>
 
 </body>
